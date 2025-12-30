@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaArrowRight } from "react-icons/fa";
 import { Toaster, toast } from "react-hot-toast";
+import Cookies from "js-cookie";
 
-const BACKEND_URL = "https://treazoxbackend.vercel.app/api/plans/all"; // User can access this
+const BACKEND_URL = "https://treazoxbackend.vercel.app/api/plans/all"; // User route
 
 export default function Plans() {
   const router = useRouter();
@@ -16,12 +17,18 @@ export default function Plans() {
   // Fetch plans from backend
   // ======================
   const fetchPlans = async () => {
+    const token = Cookies.get("token"); // Get JWT token from cookies
+    if (!token) {
+      toast.error("You must be logged in to view plans");
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await fetch(BACKEND_URL, {
         headers: {
           "Content-Type": "application/json",
-          // No Authorization needed if /all route is public for users
+          Authorization: `Bearer ${token}`, // Send token in header
         },
       });
       const data = await res.json();
