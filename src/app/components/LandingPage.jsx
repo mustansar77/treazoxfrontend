@@ -1,7 +1,27 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const LandingPage = () => {
+  const router = useRouter();
+
+  // Check token on mount
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      router.replace("/dashboard"); // Redirect to dashboard if token exists
+    }
+  }, [router]);
+
+  const handelLogin = () => {
+    router.push("/login");
+  };
+
+  const handelSignup = () => {
+    router.push("/signup");
+  };
+
   return (
     <section
       className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
@@ -27,12 +47,18 @@ const LandingPage = () => {
         </p>
 
         <div className="flex gap-4 justify-center">
-          <button className="px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:opacity-90 transition">
-            Get Started
+          <button
+            onClick={handelLogin}
+            className="px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:opacity-90 transition"
+          >
+            Login
           </button>
 
-          <button className="px-6 py-3 rounded-lg border bg-buttonColor border-transparent text-white font-semibold hover:bg-white hover:text-black transition">
-            Learn More
+          <button
+            onClick={handelSignup}
+            className="px-6 py-3 rounded-lg border bg-buttonColor border-transparent text-white font-semibold hover:bg-white hover:text-black transition"
+          >
+            Signup
           </button>
         </div>
       </div>
