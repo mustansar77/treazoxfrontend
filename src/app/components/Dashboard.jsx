@@ -1,26 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 import { Copy, FileText, Wallet, Gift } from "lucide-react";
+import Cookies from "js-cookie";
 
 const Dashboard = () => {
+const BALANCE_URL = "https://treazoxbackend.vercel.app/api/users/me";
+ 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("account");
-
-  // ====================== DUMMY DASHBOARD DATA ======================
-  const dashboard = {
-    totalAssets: 12450,
-    availableBalance: 9800,
-    dailyIncome: 45,
-  };
-
-  const referralCode = "REF12345";
-  const commissionBalance = 2650;
+  const [dashboard, setDashboard] = useState({
+    totalAssets: 0,
+    availableBalance: 0,
+    dailyIncome: 0,
+  });
+  const [commissionBalance, setCommissionBalance] = useState(0);
+  const [referralCode, setReferralCode] = useState("");
   const referralLink = `${typeof window !== "undefined" ? window.location.origin : ""}/signup?ref=${referralCode}`;
 
-  // ====================== DUMMY HISTORY DATA ======================
+  // ====================== FETCH USER DATA ======================
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const token = Cookies.get("token");
+        if (!token) return;
+
+        const res = await fetch(BALANCE_URL, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to fetch");
+
+        setDashboard({
+          totalAssets: data.user.totalAssets || 0,
+          availableBalance: data.user.balance || 0,
+          dailyIncome: data.user.dailyIncome || 0,
+        });
+        setCommissionBalance(data.user.commissionBalance || 0);
+        setReferralCode(data.user.referralCode || "");
+      } catch (err) {
+        console.error(err);
+        toast.error(err.message || "Failed to fetch dashboard data");
+      }
+    };
+
+    fetchMe();
+  }, []);
+
   const accountHistory = [
     { type: "Deposit", amount: 500, status: "Success" },
     { type: "Deposit", amount: 200, status: "Pending" },
@@ -42,8 +70,11 @@ const Dashboard = () => {
     toast.success("Referral link copied!");
   };
 
-  const handleDepositClick = () => toast("Redirect to Deposit page");
-  const handleWithdrawClick = () => toast("Redirect to Withdraw page");
+
+
+  const handleWithdraw=()=>{
+    router.push("/withdraw")
+  }
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
@@ -77,13 +108,13 @@ const Dashboard = () => {
 
           <div className="flex w-full flex-row gap-3">
             <button
-              onClick={handleDepositClick}
+              onClick={() => router.push("/deposit")}
               className="px-6 w-full py-3 bg-green-600 text-white rounded-lg"
             >
               Deposit
             </button>
             <button
-              onClick={handleWithdrawClick}
+              onClick={handleWithdraw}
               className="px-6 py-3 w-full bg-blue-600 text-white rounded-lg"
             >
               Withdraw
@@ -147,7 +178,6 @@ const Dashboard = () => {
 };
 
 /* ================= TABLE ================= */
-
 const HistoryTable = ({ title, data }) => (
   <div className="p-4 sm:p-6">
     <h2 className="text-lg font-semibold mb-4 text-primary dark:text-white">{title}</h2>
