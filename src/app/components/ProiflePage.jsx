@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Copy, Sun, Moon } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
+import Cookies from "js-cookie";
 
 const ProfilePage = () => {
-  const [mounted, setMounted] = useState(false); // check if client
+  const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState("light");
   const [user] = useState({
     name: "Mustansar Hussain Tariq",
@@ -16,22 +17,26 @@ const ProfilePage = () => {
   const [referralLink, setReferralLink] = useState("");
 
   useEffect(() => {
-    // Now safe to use window/localStorage
     setMounted(true);
 
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) setTheme(savedTheme);
+    // Read theme from cookies, fallback to light
+    const savedTheme = Cookies.get("theme") || "light";
+    setTheme(savedTheme);
 
     setReferralLink(`${window.location.origin}/signup?ref=${user.referralCode}`);
   }, [user.referralCode]);
 
   useEffect(() => {
     if (!mounted) return;
+
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+
+    // Save theme in cookie, expires in 365 days
+    Cookies.set("theme", theme, { expires: 365 });
   }, [theme, mounted]);
 
   const copyReferralLink = () => {
@@ -52,15 +57,12 @@ const ProfilePage = () => {
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
   };
 
-  if (!mounted) return null; // prevent SSR errors
+  if (!mounted) return null;
 
   return (
-    <div
-      className={`min-h-screen bg-gray-100 dark:bg-gray-900 p-6 transition-colors duration-300`}
-    >
+    <div className={`min-h-screen bg-gray-100 dark:bg-gray-900 p-6 transition-colors duration-300`}>
       <Toaster position="top-right" />
 
       {/* Theme Toggle */}
