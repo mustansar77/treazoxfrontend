@@ -1,18 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaArrowRight } from "react-icons/fa";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+
+const BACKEND_URL = "https://treazoxbackend.vercel.app/api/plans/all"; // User can access this
 
 export default function Plans() {
   const router = useRouter();
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [plans] = useState([
-    { _id: "1", totalPrice: 500, duration: 7, dailyEarning: 20 },
-    { _id: "2", totalPrice: 1000, duration: 14, dailyEarning: 45 },
-    { _id: "3", totalPrice: 2000, duration: 30, dailyEarning: 100 },
-  ]);
+  // ======================
+  // Fetch plans from backend
+  // ======================
+  const fetchPlans = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(BACKEND_URL, {
+        headers: {
+          "Content-Type": "application/json",
+          // No Authorization needed if /all route is public for users
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPlans(data.plans || []);
+      } else {
+        toast.error(data.message || "Failed to fetch plans");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error fetching plans");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
 
   const handleInvest = (plan) => {
     router.push(
@@ -28,13 +56,13 @@ export default function Plans() {
       </h1>
 
       <div className="max-w-[1170px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {plans.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-white col-span-3">
-              No plans available
-            </p>
-          ) : (
-            plans.map((plan, index) => (
+        {loading ? (
+          <p className="text-center text-gray-500 dark:text-white">Loading plans...</p>
+        ) : plans.length === 0 ? (
+          <p className="text-center text-gray-500 dark:text-white">No plans available</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {plans.map((plan, index) => (
               <div
                 key={plan._id}
                 className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col justify-between hover:scale-105 transition-transform duration-300"
@@ -46,23 +74,17 @@ export default function Plans() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Price</p>
-                    <p className="text-green-500 text-lg font-semibold">
-                      ${plan.totalPrice}
-                    </p>
+                    <p className="text-green-500 text-lg font-semibold">${plan.totalPrice}</p>
                   </div>
 
                   <div>
                     <p className="text-sm font-medium text-gray-500">Duration (Days)</p>
-                    <p className="text-green-500 text-lg font-semibold">
-                      {plan.duration} Days
-                    </p>
+                    <p className="text-green-500 text-lg font-semibold">{plan.duration} Days</p>
                   </div>
 
                   <div>
                     <p className="text-sm font-medium text-gray-500">Daily Income</p>
-                    <p className="text-green-500 text-lg font-semibold">
-                      ${plan.dailyEarning}
-                    </p>
+                    <p className="text-green-500 text-lg font-semibold">${plan.dailyEarning}</p>
                   </div>
                 </div>
 
@@ -73,9 +95,9 @@ export default function Plans() {
                   Invest Now <FaArrowRight />
                 </button>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
