@@ -5,73 +5,89 @@ import { toast, Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 
 const ITEMS_PER_PAGE = 10;
+const API_URL = "https://treazoxbackend.vercel.app/api/investment/";
 
 const Investments = () => {
   const [pending, setPending] = useState([]);
   const [approved, setApproved] = useState([]);
+  const [rejected, setRejected] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchEmail, setSearchEmail] = useState("");
   const [activeTab, setActiveTab] = useState("pending");
   const [page, setPage] = useState(1);
 
-  const token = Cookies.get("token"); // kept for reference
+  const token = Cookies.get("token");
 
-  // Dummy investments
-  const dummyInvestments = [
-    {
-      _id: "1",
-      user: { fullName: "John Doe", email: "john@example.com" },
-      price: 500,
-      dailyEarning: 5,
-      exchange: "Bitcoin",
-      transactionId: "TRX12345",
-      status: "processing",
-    },
-    {
-      _id: "2",
-      user: { fullName: "Jane Smith", email: "jane@example.com" },
-      price: 1000,
-      dailyEarning: 10,
-      exchange: "Ethereum",
-      transactionId: "TRX67890",
-      status: "approved",
-    },
-    {
-      _id: "3",
-      user: { fullName: "Alice Johnson", email: "alice@example.com" },
-      price: 250,
-      dailyEarning: 2.5,
-      exchange: "USDT",
-      transactionId: "TRX11223",
-      status: "processing",
-    },
-    // Add more dummy data as needed
-  ];
+  // =========================
+  // Fetch all investments
+  // =========================
+  const fetchInvestments = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_URL}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const pendingData = data.investments.filter(i => i.status === "pending");
+        const approvedData = data.investments.filter(i => i.status === "approved");
+        const rejectedData = data.investments.filter(i => i.status === "rejected");
 
-  // Load dummy investments
-  const fetchInvestments = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const pendingData = dummyInvestments.filter(i => i.status === "processing");
-      const approvedData = dummyInvestments.filter(i => i.status === "approved");
-      setPending(pendingData);
-      setApproved(approvedData);
+        setPending(pendingData);
+        setApproved(approvedData);
+        setRejected(rejectedData);
+      } else {
+        toast.error(data.message || "Failed to fetch investments");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error fetching investments");
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   useEffect(() => {
     fetchInvestments();
   }, []);
 
-  // Approve / Reject actions (frontend only)
-  const handleStatusUpdate = (inv, status) => {
-    if (status === "approved") setApproved(prev => [...prev, { ...inv, status }]);
-    setPending(prev => prev.filter(i => i._id !== inv._id));
-    toast.success(`Investment ${status} (dummy)`);
+  // =========================
+  // Update status
+  // =========================
+const handleStatusUpdate = async (invId, status) => {
+  try {
+    const res = await fetch(`${API_URL}status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id: invId, status }), // <-- send id here
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      toast.success(`Investment ${status} successfully`);
+      fetchInvestments(); // Refresh data
+    } else {
+      toast.error(data.message || "Failed to update status");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Error updating status");
+  }
+};
+
+  const dataMap = {
+    pending,
+    approved,
+    rejected,
   };
 
-  const data = activeTab === "pending" ? pending : approved;
+  const data = dataMap[activeTab] || [];
   const filtered = data.filter(inv =>
     inv.user?.email?.toLowerCase().includes(searchEmail.toLowerCase())
   );
@@ -85,18 +101,23 @@ const Investments = () => {
 
       {/* Tabs */}
       <div className="flex gap-4 mb-4 flex-wrap">
-        <button
-          onClick={() => { setActiveTab("pending"); setPage(1); }}
-          className={`px-4 py-2 rounded ${activeTab === "pending" ? "bg-blue-600 text-white" : "bg-gray-300 dark:bg-gray-700 dark:text-white"}`}
-        >
-          Pending
-        </button>
-        <button
-          onClick={() => { setActiveTab("approved"); setPage(1); }}
-          className={`px-4 py-2 rounded ${activeTab === "approved" ? "bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 dark:text-white"}`}
-        >
-          Approved
-        </button>
+        {["pending", "approved", "rejected"].map(tab => (
+          <button
+            key={tab}
+            onClick={() => { setActiveTab(tab); setPage(1); }}
+            className={`px-4 py-2 rounded ${
+              activeTab === tab
+                ? tab === "approved"
+                  ? "bg-green-600 text-white"
+                  : tab === "rejected"
+                  ? "bg-red-600 text-white"
+                  : "bg-blue-600 text-white"
+                : "bg-gray-300 dark:bg-gray-700 dark:text-white"
+            }`}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
       </div>
 
       {/* Search */}
@@ -139,25 +160,27 @@ const Investments = () => {
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${inv.price}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${inv.dailyEarning}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{inv.exchange}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{inv.transactionId}</td>
+                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{inv.trxId}</td>
                   <td className="px-4 py-2 text-center flex justify-center gap-2">
                     {activeTab === "pending" ? (
                       <>
                         <button
-                          onClick={() => handleStatusUpdate(inv, "approved")}
+                          onClick={() => handleStatusUpdate(inv._id, "approved")}
                           className="px-2 py-1 bg-green-500 text-white rounded"
                         >
                           Approve
                         </button>
                         <button
-                          onClick={() => handleStatusUpdate(inv, "rejected")}
+                          onClick={() => handleStatusUpdate(inv._id, "rejected")}
                           className="px-2 py-1 bg-red-500 text-white rounded"
                         >
                           Reject
                         </button>
                       </>
-                    ) : (
+                    ) : activeTab === "approved" ? (
                       <span className="text-green-500 font-semibold">Approved</span>
+                    ) : (
+                      <span className="text-red-500 font-semibold">Rejected</span>
                     )}
                   </td>
                 </tr>

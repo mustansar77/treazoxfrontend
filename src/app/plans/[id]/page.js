@@ -3,23 +3,21 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
+import Cookies from "js-cookie";
 
 export default function PlanDetail() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   // Plan details from search params
-  const planId = searchParams.get("id") || "1";
-  const price = Number(searchParams.get("price")) || 1000;
-  const duration = searchParams.get("duration") || 30;
-  const dailyIncome = searchParams.get("dailyIncome") || 50;
+  const planId = searchParams.get("id");
+  const price = Number(searchParams.get("price"));
+  const duration = Number(searchParams.get("duration"));
+  const dailyIncome = Number(searchParams.get("dailyIncome"));
 
   const [loading, setLoading] = useState(false);
   const [exchange, setExchange] = useState("binance");
   const [trxId, setTrxId] = useState("");
-
-  // Dummy userId for demo
-  const userId = "1234567890abcdef";
 
   const EXCHANGE_DETAILS = {
     binance: { name: "Binance", address: "bnb1qexampleaddresshere", network: "BEP-20" },
@@ -27,11 +25,11 @@ export default function PlanDetail() {
     bitget: { name: "Bitget", address: "0xbitgetexampleaddress", network: "TRC-20" },
   };
 
-  const isFormValid = trxId.trim() && planId && price && exchange && userId;
+  const currentExchange = EXCHANGE_DETAILS[exchange];
+  const isFormValid = trxId.trim() && planId && price && duration && dailyIncome;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!isFormValid) {
       toast.error("Please complete all fields");
       return;
@@ -39,19 +37,41 @@ export default function PlanDetail() {
 
     setLoading(true);
 
-    // Dummy submission
-    setTimeout(() => {
-      toast.success("Investment submitted successfully!");
-      setLoading(false);
-      router.push("/dashboard");
-    }, 1000);
-  };
+    const token = Cookies.get("token"); // get user token
 
-  const currentExchange = EXCHANGE_DETAILS[exchange];
+    try {
+      const res = await fetch("https://treazoxbackend.vercel.app/api/investment/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          planId,
+          trxId,
+          exchange,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Investment submitted successfully!");
+        router.push("/dashboard");
+      } else {
+        toast.error(data.message || "Failed to submit investment");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 py-10">
       <Toaster position="top-right" />
+
       <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 sm:p-6 space-y-6">
         <h1 className="text-xl sm:text-2xl font-bold text-center text-gray-900 dark:text-white">
           Plan Details
@@ -115,7 +135,7 @@ export default function PlanDetail() {
           />
         </div>
 
-        {/* Submit */}
+        {/* Submit Button */}
         <form onSubmit={handleSubmit}>
           <button
             type="submit"
