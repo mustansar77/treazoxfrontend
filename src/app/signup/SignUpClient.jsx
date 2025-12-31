@@ -89,7 +89,7 @@ export default function SignUpClient() {
             placeholder="Full Name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg"
+          className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
             required
           />
 
@@ -98,7 +98,7 @@ export default function SignUpClient() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg"
+          className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
             required
           />
 
@@ -107,7 +107,7 @@ export default function SignUpClient() {
             placeholder="Phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg"
+       className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
             required
           />
 
@@ -117,7 +117,7 @@ export default function SignUpClient() {
             placeholder="Referral Code (optional)"
             value={referralCode}
             onChange={(e) => setReferralCode(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg"
+           className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
           />
 
           <input
@@ -125,7 +125,7 @@ export default function SignUpClient() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg"
+         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
             required
           />
 
@@ -134,7 +134,7 @@ export default function SignUpClient() {
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg"
+          className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
             required
           />
 
@@ -153,13 +153,13 @@ export default function SignUpClient() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-white py-3 rounded-lg"
+       className={`w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/70 transition ${ loading ? "opacity-70 cursor-not-allowed" : "" }`}
           >
             {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
 
-        <p className="text-center text-sm mt-4">
+        <p className="text-center text-sm mt-4 text-primary dark:text-white">
           Already have an account?{" "}
           <Link href="/login" className="font-medium">
             Login
