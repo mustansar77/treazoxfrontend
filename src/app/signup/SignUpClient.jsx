@@ -145,7 +145,7 @@ export default function SignUpClient() {
               onChange={(e) => setAcceptPolicy(e.target.checked)}
               className="w-4 h-4"
             />
-            <label>
+            <label  className="text-center text-sm mt-4 text-primary dark:text-white">
               I accept the <Link href="/policy">Terms & Policy</Link>
             </label>
           </div>
