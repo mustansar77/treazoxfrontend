@@ -134,7 +134,7 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
           <p className="text-gray-500">Total Assets</p>
           <h2 className="text-3xl font-bold text-green-600 mb-6">
-            ${dashboard.availableBalance + commissionBalance}
+            ${dashboard.availableBalance}
           </h2>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
