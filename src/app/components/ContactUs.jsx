@@ -3,12 +3,12 @@ import React from "react";
 
 const ContactUs = () => {
   return (
-    <section className="py-16 md:py-20 bg-gray-100 dark:bg-gray-900">
+    <section className="py-10 bg-gray-100 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         
         {/* Title & Description */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-primary dark:text-white">
+          <h2 className="text-3xl text-primary dark:text-white md:text-4xl font-bold mb-4">
             Contact Us
           </h2>
           <p className="text-gray-600 text-sm sm:text-base">
@@ -22,7 +22,7 @@ const ContactUs = () => {
           
           {/* Contact Info */}
           <div className="space-y-6 text-center lg:text-left">
-            <h3 className="text-xl font-semibold text-primary dark:text-white">
+            <h3 className="text-xl text-primary dark:text-white md:text-4xl font-bold mb-4">
               Get in Touch
             </h3>
             <p className="text-gray-600 text-sm sm:text-base">

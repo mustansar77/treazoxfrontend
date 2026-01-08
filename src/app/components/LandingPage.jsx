@@ -49,7 +49,7 @@ const LandingPage = () => {
         <div className="flex gap-4 justify-center">
           <button
             onClick={handelLogin}
-            className="px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:opacity-90 transition"
+            className="px-6 py-3 rounded-lg bg-gray-800 text-white font-semibold hover:opacity-90 transition"
           >
             Login
           </button>

@@ -75,7 +75,7 @@ export default function SignUpClient() {
   };
 
   return (
-    <div className="w-full min-h-screen flex justify-center items-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="w-full h-[90vh] flex justify-center items-center bg-gray-100 dark:bg-gray-900 p-4">
       <Toaster position="top-right" />
 
       <div className="max-w-md w-full bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-2xl">
@@ -139,12 +139,12 @@ export default function SignUpClient() {
           />
 
           <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={acceptPolicy}
-              onChange={(e) => setAcceptPolicy(e.target.checked)}
-              className="w-4 h-4"
-            />
+           <input
+  type="checkbox"
+  checked={acceptPolicy}
+  onChange={(e) => setAcceptPolicy(e.target.checked)}
+  className="w-4 h-4 accent-primary dark:accent-green-500"
+/>
             <label  className="text-center text-sm  text-primary dark:text-white">
               I accept the <Link href="/policy">Terms & Policy</Link>
             </label>

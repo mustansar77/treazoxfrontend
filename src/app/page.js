@@ -4,6 +4,7 @@ import AboutUs from './components/AboutUs'
 import InvestmentPlans from './components/InvestmentPlans'
 import LuckyDraw from './components/LuckyDraw'
 import ContactUs from './components/ContactUs'
+import DrawsOnWithoutToken from './components/DrawsOnWithoutToken'
 
 const page = () => {
   return (
@@ -12,7 +13,7 @@ const page = () => {
     <LandingPage/>
     <AboutUs/>
     <InvestmentPlans/>
-    <LuckyDraw/>
+   <DrawsOnWithoutToken/>
     <ContactUs/>
     </>
   )

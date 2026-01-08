@@ -63,7 +63,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full min-h-screen flex justify-center items-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="w-full h-[90vh] flex justify-center items-center bg-gray-100 dark:bg-gray-900 p-4">
       <Toaster position="top-right" />
       <div className="max-w-md w-full bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-2xl">
         <h1 className="text-2xl font-bold mb-6 text-center text-primary dark:text-white">

@@ -26,7 +26,7 @@ const aboutCards = [
 
 const AboutUs = () => {
   return (
-    <section className="py-20 bg-gray-100 dark:bg-gray-900">
+    <section className="py-10 bg-gray-100 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-6">
         {/* Title */}
         <div className="text-center mb-12">

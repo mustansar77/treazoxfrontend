@@ -1,66 +1,45 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const plansData = [
-  {
-    title: "Plan 1",
-    price: "$50",
-    dailyEarning: "$3 / day",
-    duration: "30 Days",
-  },
-  {
-    title: "Plan 2",
-    price: "$100",
-    dailyEarning: "$7 / day",
-    duration: "30 Days",
-  },
-  {
-    title: "Plan 3",
-    price: "$200",
-    dailyEarning: "$15 / day",
-    duration: "45 Days",
-  },
-  {
-    title: "Plan 4",
-    price: "$300",
-    dailyEarning: "$25 / day",
-    duration: "60 Days",
-  },
-  {
-    title: "Plan 5",
-    price: "$500",
-    dailyEarning: "$45 / day",
-    duration: "60 Days",
-  },
-  {
-    title: "Plan 6",
-    price: "$800",
-    dailyEarning: "$75 / day",
-    duration: "90 Days",
-  },
-  {
-    title: "Plan 7",
-    price: "$1000",
-    dailyEarning: "$100 / day",
-    duration: "90 Days",
-  },
-  {
-    title: "Plan 8",
-    price: "$1500",
-    dailyEarning: "$160 / day",
-    duration: "120 Days",
-  },
-];
+const BASE_URL = "https://treazoxbackend.vercel.app/api/plans/withoutlogin";
 
 const InvestmentPlans = () => {
+  const [plansData, setPlansData] = useState([]);
   const [visiblePlans, setVisiblePlans] = useState(4);
+  const [loading, setLoading] = useState(true);
 
   const handleViewMore = () => {
     setVisiblePlans(plansData.length);
   };
 
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const res = await fetch(BASE_URL);
+        const data = await res.json();
+
+        // adjust this if your API response structure is different
+        setPlansData(data?.plans || data);
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="pt-20 text-center text-primary font-semibold">
+        Loading plans...
+      </section>
+    );
+  }
+
   return (
-    <section className="py-20 bg-gray-100 dark:bg-gray-900">
+    <section className="py-10 bg-gray-100 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-6">
         {/* Title */}
         <div className="text-center mb-12">
@@ -78,7 +57,8 @@ const InvestmentPlans = () => {
           {plansData.slice(0, visiblePlans).map((plan, index) => (
             <div
               key={index}
-              className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800 shadow-md hover:shadow-lg transition"
+              className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800 shadow-[0_20px_40px_rgba(0,0,0,0.12)]
+                           dark:shadow-[0_20px_40px_rgba(0,0,0,0.45)] transition"
             >
               <h3 className="text-xl font-semibold mb-4 text-primary dark:text-white">
                 {plan.title}
@@ -86,21 +66,30 @@ const InvestmentPlans = () => {
 
               <div className="space-y-2 text-gray-600 text-sm">
                 <p className="text-green-500">
-                  <span className="font-medium text-primary dark:text-white">Price:</span> {plan.price}
+                  <span className="font-medium text-primary dark:text-white">
+                    Price:
+                  </span>{" "}
+                  ${plan.totalPrice}
                 </p>
+
                 <p className="text-green-500">
-                  <span className="font-medium text-primary dark:text-white">Daily Earning:</span>{" "}
-                  {plan.dailyEarning}
+                  <span className="font-medium text-primary dark:text-white">
+                    Daily Earning:
+                  </span>{" "}
+                  ${plan.dailyEarning} / day
                 </p>
+
                 <p className="text-green-500">
-                  <span className="font-medium text-primary dark:text-white">Duration:</span>{" "}
-                  {plan.duration}
+                  <span className="font-medium text-primary dark:text-white">
+                    Duration:
+                  </span>{" "}
+                  {plan.duration} Days
                 </p>
               </div>
 
-              <button className="mt-6 w-full py-2 rounded-lg bg-primary text-white hover:bg-primary/70 font-semibold hover:opacity-90 transition">
+              {/* <button className="mt-6 w-full py-2 rounded-lg bg-primary text-white hover:bg-primary/70 font-semibold transition">
                 Invest Now
-              </button>
+              </button> */}
             </div>
           ))}
         </div>
@@ -110,7 +99,7 @@ const InvestmentPlans = () => {
           <div className="mt-12 text-center">
             <button
               onClick={handleViewMore}
-              className="px-8 py-3 rounded-lg border border-primary text-primary dark:border-white dark:text-white font-semibold dark:hover:bg-white dark:hover:text-primary hover:bg-primary  hover:text-white transition"
+              className="px-8 py-3 rounded-lg border border-primary text-primary dark:border-white dark:text-white font-semibold hover:bg-primary hover:text-white transition"
             >
               View More
             </button>
