@@ -126,9 +126,9 @@ const LuckyDraw = () => {
                   {draw.participants.length}/{draw.participantsLimit}
                 </p>
 
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                {/* <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                   Ends at: {new Date(draw.endDate).toLocaleString()}
-                </p>
+                </p> */}
 
                 {/* BUTTON */}
                 <button
